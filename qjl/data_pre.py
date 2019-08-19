@@ -35,22 +35,41 @@ def jiebaclearText(text):
 #copy end
 
 if  __name__  == '__main__':
-    print(sys.argv)
-    assert(len(sys.argv)==3)
+    #print(sys.argv)
+    assert(len(sys.argv)==3 or len(sys.argv)==4)
     filename=sys.argv[1]
     assert(os.path.exists(filename))
-    file_to_print_name=sys.argv[2]
+    if len(sys.argv)==3:
+        file_to_print_name=sys.argv[2]
+        file_to_print=[]
+    else:
+        pos_file_to_print_name=sys.argv[2]
+        neg_file_to_print_name=sys.argv[3]
+        pos_file_to_print=[]
+        neg_file_to_print=[]
 
     data=pd.read_csv(filename,encoding="utf-8")
-    file_to_print=[]
+
 
     count =0
 
     for index, row in data.iterrows():
         string=""
         label=row["label"]
-        records=json.loads(row["callback_content"])
-        for rec in records["result"]:
+        if len(sys.argv)==3:
+            records=json.loads(row["callback_content"])
+            if 'result' not in records:
+                continue
+            record_result=records["result"]
+        else:
+            try:
+                records=json.loads(row["records"].replace("\'", "\""))
+                record_result=records
+            except:
+                print("wrong")
+                print("")
+
+        for rec in record_result:
             try:
                 string=string+str(rec["type"])+" "+str(rec["detail"])+" "+str(rec["other"])+" "
 
@@ -70,8 +89,7 @@ if  __name__  == '__main__':
                 # print("except")
                 # exit()
         if (count % 100)==0:
-            print("\r",end="")
-            print(count)
+            print("\x1B[1A\x1B[K"+str(count))
         string = jiebaclearText(string)
         count=count+1
         if label==1:
@@ -82,13 +100,22 @@ if  __name__  == '__main__':
             print('wrong label'+str(label))
             continue
         seg=string+print_label
-        file_to_print.append(seg.encode("utf-8"))
+        if len(sys.argv)==3:
+            file_to_print.append(seg.encode("utf-8"))
+        else:
+            pos_file_to_print.append(seg.encode("utf-8"))
+            neg_file_to_print.append(seg.encode("utf-8"))
 
-    for i in file_to_print:
-        if type(i)!=str:
-            print(i)
-            print(type(i))
-            break
-
-    with open(file_to_print_name,"w") as f:
-        f.writelines(file_to_print)
+    # for i in file_to_print:
+    #     if type(i)!=str:
+    #         print(i)
+    #         print(type(i))
+    #         break
+    if len(sys.argv)==3:
+        with open(file_to_print_name,"w") as f:
+            f.writelines(file_to_print)
+    else:
+        with open(pos_file_to_print_name,"w") as f:
+            f.writelines(pos_file_to_print)
+        with open(neg_file_to_print_name,"w") as f:
+            f.writelines(neg_file_to_print)

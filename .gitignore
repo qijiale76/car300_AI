@@ -1,3 +1,7 @@
 *.zip
 *.json
-*.csv    
+*.csv
+*.txt
+*.vec
+*.bin
+*.xlsx
