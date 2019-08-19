@@ -17,9 +17,9 @@ def pre_process(x):
     x=re.sub(r',+',',',x)
     x=re.sub(r'(,|\.)\)',')',x)
     x=re.sub(r'\(\)','',x)
+    x=re.sub(r'\(|\)',' ',x)
     x=re.sub(r"(,:)|(\.:)|(:\.)", ":", (x))
     x=re.sub(r":+", ":", (x))
     x=re.sub(r'_+','',x)
     x=re.sub(r'①|②|③|④|⑤|⑥|⑦|⑧|⑨|⑩|⑾|☆|¤|�|&','',x)
-    
     return x
